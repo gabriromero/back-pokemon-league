@@ -24,3 +24,22 @@ class PlayerInfo(MethodView):
     def get(self):
         player = PlayerModel.query.get_or_404(get_jwt_identity())
         return player
+
+@blp.route("/fake/players")
+class PlayerInfo(MethodView):
+    @blp.response(200)
+    def get(self):
+        return [
+            {
+                'username' : 'John',
+                'wins'     : 7,
+            },
+            {
+                'username' : 'Erdeiby',
+                'wins'     : 9,
+            },
+            {
+                'username' : 'Avdalian',
+                'wins'     : 3,
+            }
+        ]
