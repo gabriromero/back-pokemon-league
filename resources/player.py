@@ -10,30 +10,37 @@ from sqlalchemy.exc import IntegrityError
 
 from db import db
 from models import PlayerModel
-from schemas import PlayerSchema
+
+from schemas import CreatePlayerSchema
+from schemas import ClassificationSchema
 
 blp = Blueprint("Players", __name__, description="Player operations")
 
-@blp.route("/private/players")
-class PrivatePlayers(MethodView):
-    @blp.response(200, PlayerSchema(many=True))
-    def get(self):
-        secret_key = request.headers.get('SECRET_HEADER')
-        if secret_key != os.getenv("SECRET_HEADER"):
-            return abort(401, description='Unauthorized')
+@blp.route("/private/create-player")
+class Register(MethodView):
+    @blp.arguments(CreatePlayerSchema)
+    def post(self, player_data):
+        player = PlayerModel(
+            username = player_data["username"],
+            password = player_data["password"],
+        )
+
+        try:
+            db.session.add(player)
+            db.session.commit()
+        except IntegrityError:
+            abort(400,message="Player with same username exist")
         
+        return {"msg" : f"Player with username {player.username} created"}, 201
+
+@blp.route("/classification")
+class Classification(MethodView):
+    @blp.response(200, ClassificationSchema(many=True))
+    def get(self):
         return PlayerModel.query.all()
 
-@blp.route("/player")
-class PlayerInfo(MethodView):
-    @blp.response(200, PlayerSchema())
-    @jwt_required()
-    def get(self):
-        player = PlayerModel.query.get_or_404(get_jwt_identity())
-        return player
-
 @blp.route("/fake/players")
-class PlayerInfo(MethodView):
+class FakePlayerInfo(MethodView):
     @blp.response(200)
     def get(self):
         return [
