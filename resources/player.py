@@ -13,6 +13,8 @@ from models import PlayerModel
 
 from schemas import CreatePlayerSchema
 from schemas import ClassificationSchema
+from schemas import ProfileSchema
+from schemas import LoginPlayerSchema
 
 blp = Blueprint("Players", __name__, description="Player operations")
 
@@ -69,3 +71,25 @@ class FakePlayerInfo(MethodView):
                 'matches_won'     : 10,
             }
         ]
+
+@blp.route("/login")
+class Login(MethodView):
+    @blp.arguments(LoginPlayerSchema)
+    def post(self, user_data):
+        player = PlayerModel.query.filter(
+            PlayerModel.username == user_data["username"]
+        ).first()
+
+        if player and player.password == user_data["password"]:
+            access_token = create_access_token(identity=player.id)
+            return {"access_token" : access_token}
+        
+        abort(401, message="Invalid credentials")
+
+@blp.route("/profile")
+class Profile(MethodView):
+    @blp.response(200, ProfileSchema)
+    @jwt_required()
+    def get(self):
+        player = PlayerModel.query.get_or_404(get_jwt_identity())
+        return player

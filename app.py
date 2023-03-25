@@ -48,6 +48,7 @@ migrate = Migrate(app, db)
 api = Api(app)
 
 app.config["JWT_SECRET_KEY"] = os.getenv("SECRET_KEY")
+jwt =  JWTManager(app)
 
 api.register_blueprint(PlayerBlueprint)
 api.register_blueprint(MatchBlueprint)
