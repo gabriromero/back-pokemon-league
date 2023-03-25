@@ -15,6 +15,7 @@ from schemas import CreatePlayerSchema
 from schemas import ClassificationSchema
 from schemas import ProfileSchema
 from schemas import LoginPlayerSchema
+from schemas import ProfileUpdateSchema
 
 blp = Blueprint("Players", __name__, description="Player operations")
 
@@ -93,3 +94,17 @@ class Profile(MethodView):
     def get(self):
         player = PlayerModel.query.get_or_404(get_jwt_identity())
         return player
+
+    @blp.arguments(ProfileUpdateSchema)
+    @blp.response(200, ProfileSchema)
+    @jwt_required()
+    def put(self, profile_data):
+        player = PlayerModel.query.get_or_404(get_jwt_identity())
+
+        if("profile_pic" in profile_data):
+            player.profile_pic = profile_data["profile_pic"]
+        
+        db.session.add(player)
+        db.session.commit()
+
+        return player,200
