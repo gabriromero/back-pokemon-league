@@ -39,21 +39,33 @@ class Classification(MethodView):
     def get(self):
         return PlayerModel.query.all()
 
-@blp.route("/fake/players")
+@blp.route("/fake/classification")
 class FakePlayerInfo(MethodView):
     @blp.response(200)
     def get(self):
         return [
             {
                 'username' : 'John',
-                'wins'     : 7,
+                'matches_won'     : 7,
             },
             {
                 'username' : 'Erdeiby',
-                'wins'     : 9,
+                'matches_won'     : 9,
             },
             {
                 'username' : 'Avdalian',
-                'wins'     : 3,
+                'matches_won'     : 3,
+            },
+            {
+                'username' : 'Guzzom',
+                'matches_won'     : 4,
+            },
+            {
+                'username' : 'Kmilon',
+                'matches_won'     : 4,
+            },
+            {
+                'username' : 'Suli',
+                'matches_won'     : 10,
             }
         ]
