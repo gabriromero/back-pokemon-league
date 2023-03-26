@@ -26,5 +26,10 @@ class ProfileUpdateSchema(Schema):
 
 # Match Schema
 class MatchSchema(Schema):
-    id = fields.Int(dump_only=True)
     jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=9)])
+
+class GenerateMatchesSchema(Schema):
+    jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=10)])
+
+class HardcodeMatchSchema(Schema):
+    jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=10)])

@@ -10,4 +10,4 @@ class PlayerModel(db.Model):
     matches_played = db.Column(db.Integer, default=0)
     matches_won = db.Column(db.Integer, default=0)
 
-#todo: matches with matches
+    matches = db.relationship("MatchModel", back_populates="player", lazy="dynamic")
