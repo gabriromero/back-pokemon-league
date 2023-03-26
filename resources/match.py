@@ -1,4 +1,6 @@
 
+from itertools import combinations
+import random
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
@@ -13,6 +15,8 @@ from schemas import MatchSchema
 from schemas import GenerateMatchesSchema
 from schemas import HardcodeMatchSchema
 
+from random import choice
+
 blp = Blueprint("Matches", __name__, description="Match operations")
 
 @blp.route("/matches")
@@ -26,10 +30,16 @@ class GenerateMatches(MethodView):
     @blp.arguments(GenerateMatchesSchema)
     @blp.response(200)
     def post(self, match_data):
-
         jornada = match_data["jornada"]
+
+        for i in range(10):
+            player1 = PlayerModel.query.get_or_404(get_player_matches()[0][0])
+            player2 = PlayerModel.query.get_or_404(get_player_matches()[0][1])
+            createSingleMatch(player1,player2, jornada)
+
+        return "created"
         
-        createSingleMatch(player1, player2, jornada)
+
         
 
 @blp.route("/private/hardcode-match")
@@ -63,12 +73,15 @@ class CleanMatches(MethodView):
 
 def createSingleMatch(player1, player2, jornada):
 
+    if(player1.id == player2.id):
+        abort(403, message="Mismo player")
+
     match_exists = ((MatchModel.query.filter(MatchModel.player_1_id == player1.id, MatchModel.player_2_id == player2.id).first() or
                             MatchModel.query.filter(MatchModel.player_1_id == player2.id, MatchModel.player_2_id == player1.id).first()) and
                             MatchModel.query.filter(MatchModel.jornada == jornada).first())
             
     if(match_exists):
-        abort(403, message="Ya existe este match")
+        abort(403, message=f"{match_exists.player_1_id} , {match_exists.player_2_id}, Ya existe este match")
 
     match = MatchModel(player_1_id = player1.id,
                         player_2_id = player2.id,
@@ -88,33 +101,34 @@ def createSingleMatch(player1, player2, jornada):
     return {"msg" : f"Partido entre {player1.username} y {player2.username} creado"}, 201
 
 def get_player_matches():
-    # Obtener todos los partidos de la base de datos
     matches = MatchModel.query.all()
 
-    # Crear un diccionario para mantener un registro de la cantidad de veces que cada par de jugadores ha jugado juntos
-    matches_played = {}
+    player_combinations = {}
 
-    # Iterar sobre la lista de partidos
     for match in matches:
-        # Obtener los IDs de los jugadores que participaron en el partido
         player1_id = match.player_1_id
         player2_id = match.player_2_id
 
-        # Ordenar los IDs para que siempre se almacenen en el mismo orden
         players = sorted([player1_id, player2_id])
 
-        # Actualizar el diccionario con la información de los jugadores que han participado en ese partido
-        if tuple(players) not in matches_played:
-            matches_played[tuple(players)] = 1
+        jornada = match.jornada
+
+        if tuple(players) not in player_combinations:
+            player_combinations[tuple(players)] = [jornada]
         else:
-            matches_played[tuple(players)] += 1
+            player_combinations[tuple(players)].append(jornada)
 
-    # Crear una lista de tuplas para cada par de jugadores y la cantidad de partidos que han jugado juntos
-        player_matches = []
-        for players, count in matches_played.items():
-            player1 = PlayerModel.query.get(players[0])
-            player2 = PlayerModel.query.get(players[1])
-            player_matches.append((player1.username, player2.username, count))
+    combinations_list = []
+    for players in combinations(PlayerModel.query.all(), 2):
+        player1_id = players[0].id
+        player2_id = players[1].id
+        players = sorted([player1_id, player2_id])
 
-        # Devolver la lista de partidos por jugador
-        return player_matches
+        if tuple(players) in player_combinations:
+            count = len(player_combinations[tuple(players)])
+            combinations_list.append((players[0], players[1], count))
+        else:
+            combinations_list.append((players[0], players[1], 0))
+
+    random.shuffle(combinations_list)
+    return sorted(combinations_list, key=lambda x: x[2])
