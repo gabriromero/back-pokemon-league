@@ -11,6 +11,13 @@ class ProfileSchema(Schema):
     matches_played = fields.Int()
     matches_won = fields.Int()
 
+class PrivatePlayersSchema(Schema):
+    id = fields.Int(dump_only=True)
+    username = fields.Str(required=True, validate=[validate.Length(min=3, max=12)])
+    profile_pic = fields.Str(required=True)
+    matches_played = fields.Int()
+    matches_won = fields.Int()
+
 class CreatePlayerSchema(Schema):
     id = fields.Int(dump_only=True)
     username = fields.Str(required=True, validate=[validate.Length(min=3, max=12)])
@@ -27,9 +34,15 @@ class ProfileUpdateSchema(Schema):
 # Match Schema
 class MatchSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=9)])
+    player_1_id = fields.Int(required=True)
+    player_2_id = fields.Int(required=True)
+    player_1_finished = fields.Int(required=True)
+    player_2_finished = fields.Int(required=True)
 
 class GenerateMatchesSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=10)])
 
 class HardcodeMatchSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=10)])
+    player_1_id = fields.Int(required=True)
+    player_2_id = fields.Int(required=True)

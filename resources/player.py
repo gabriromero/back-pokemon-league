@@ -16,6 +16,7 @@ from schemas import ClassificationSchema
 from schemas import ProfileSchema
 from schemas import LoginPlayerSchema
 from schemas import ProfileUpdateSchema
+from schemas import PrivatePlayersSchema
 
 blp = Blueprint("Players", __name__, description="Player operations")
 
@@ -35,6 +36,11 @@ class Register(MethodView):
             abort(400,message="Player with same username exist")
         
         return {"msg" : f"Player with username {player.username} created"}, 201
+@blp.route("/private/players")
+class Register(MethodView):
+    @blp.response(200,PrivatePlayersSchema(many=True))
+    def get(self):
+        return PlayerModel.query.all()
 
 @blp.route("/classification")
 class Classification(MethodView):
