@@ -1,6 +1,8 @@
 
 from itertools import combinations
+from math import factorial
 import random
+import time
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
@@ -31,16 +33,22 @@ class GenerateMatches(MethodView):
     @blp.response(200)
     def post(self, match_data):
         jornada = match_data["jornada"]
+        nCombates = match_data["nCombates"]
+        nPlayers = PlayerModel.query.count()
+        lambdaNum = max_edges(nPlayers,nCombates)
 
-        for i in range(10):
+        start_time = time.time()
+
+        nCombatesDone = 0
+        while nCombatesDone < lambdaNum and time.time() - start_time < 3:
             player1 = PlayerModel.query.get_or_404(get_player_matches()[0][0])
             player2 = PlayerModel.query.get_or_404(get_player_matches()[0][1])
-            createSingleMatch(player1,player2, jornada)
+            if(createSingleMatch(player1, player2, jornada, nCombates)):
+                nCombatesDone = nCombatesDone + 1
 
-        return "created"
-        
-
-        
+        if(nCombatesDone != lambdaNum):
+            return "Matcheo no óptimo, borrar combates y reiniciar"
+        else: return "Matcheo óptimo!"
 
 @blp.route("/private/hardcode-match")
 class HardcodeMatch(MethodView):
@@ -51,7 +59,7 @@ class HardcodeMatch(MethodView):
         player2 = PlayerModel.query.get_or_404(match_data["player_2_id"])
         jornada = match_data["jornada"]
 
-        return createSingleMatch(player1, player2, jornada)
+        return {"data" :createSingleMatch(player1, player2, jornada, 1)}
 
 @blp.route("/private/clean-matches")
 class CleanMatches(MethodView):
@@ -71,17 +79,24 @@ class CleanMatches(MethodView):
 
         return {"msg" : f"Partidos borrados, {len(partidos)}"}, 200
 
-def createSingleMatch(player1, player2, jornada):
+def createSingleMatch(player1, player2, jornada, limit):
+
+    if(get_matches_for_jornada(player1.id,jornada) >= limit or
+       get_matches_for_jornada(player2.id,jornada) >= limit):
+        return False
 
     if(player1.id == player2.id):
-        abort(403, message="Mismo player")
+        return False
 
     match_exists = ((MatchModel.query.filter(MatchModel.player_1_id == player1.id, MatchModel.player_2_id == player2.id).first() or
                             MatchModel.query.filter(MatchModel.player_1_id == player2.id, MatchModel.player_2_id == player1.id).first()) and
                             MatchModel.query.filter(MatchModel.jornada == jornada).first())
             
     if(match_exists):
-        abort(403, message=f"{match_exists.player_1_id} , {match_exists.player_2_id}, Ya existe este match")
+        return False
+    
+    
+
 
     match = MatchModel(player_1_id = player1.id,
                         player_2_id = player2.id,
@@ -98,7 +113,7 @@ def createSingleMatch(player1, player2, jornada):
     except SQLAlchemyError as e:
         abort(500, message="An error occurred creating a match.")
 
-    return {"msg" : f"Partido entre {player1.username} y {player2.username} creado"}, 201
+    return True
 
 def get_player_matches():
     matches = MatchModel.query.all()
@@ -132,3 +147,17 @@ def get_player_matches():
 
     random.shuffle(combinations_list)
     return sorted(combinations_list, key=lambda x: x[2])
+
+def get_matches_for_jornada(player_id, jornada):
+    return MatchModel.query.join(
+        PlayerModel,
+        db.or_(
+            MatchModel.player_1_id == PlayerModel.id,
+            MatchModel.player_2_id == PlayerModel.id,
+        ),
+    ).filter(
+        PlayerModel.id == player_id, MatchModel.jornada == jornada
+    ).count()
+
+def max_edges(n, max_aristas):
+    return min(n * max_aristas // 2, n * (n - 1) // 2)

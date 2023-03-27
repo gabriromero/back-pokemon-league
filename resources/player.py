@@ -12,6 +12,7 @@ from db import db
 from models import PlayerModel
 
 from schemas import CreatePlayerSchema
+from schemas import DeletePlayerSchema
 from schemas import ClassificationSchema
 from schemas import ProfileSchema
 from schemas import LoginPlayerSchema
@@ -36,6 +37,17 @@ class Register(MethodView):
             abort(400,message="Player with same username exist")
         
         return {"msg" : f"Player with username {player.username} created"}, 201
+    
+@blp.route("/private/delete-player")
+class Register(MethodView):
+    @blp.arguments(DeletePlayerSchema)
+    def delete(self, player_data):
+        player = PlayerModel.query.get_or_404(player_data["id"])
+
+        db.session.delete(player)
+        db.session.commit()
+        return {"message": f"Player {player.username} deleted."}
+    
 @blp.route("/private/players")
 class Register(MethodView):
     @blp.response(200,PrivatePlayersSchema(many=True))
