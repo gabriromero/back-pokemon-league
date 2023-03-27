@@ -1,6 +1,5 @@
 
 from itertools import combinations
-from math import factorial
 import random
 import time
 from flask.views import MethodView
@@ -54,7 +53,7 @@ class GenerateMatches(MethodView):
                 time.sleep(max(0, 2 - (time.time() - start_time)))
                 delete_matches_of_jornada(jornada)
             else:
-                return "Matcheo óptimo!"
+                return f"Matcheo óptimo, creados {nCombatesDone} enfrentamientos"
         
         return "Matcheo no óptimo, borrar combates y reiniciar"
 
