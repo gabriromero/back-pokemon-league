@@ -44,7 +44,7 @@ class MatchSchema(Schema):
 
 class GenerateMatchesSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=0, max=10)])
-    nCombates = fields.Int(validate=[validate.Range(min=1, max=5)])
+    nMatches = fields.Int(validate=[validate.Range(min=2, max=10)])
 
 class HardcodeMatchSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=10)])

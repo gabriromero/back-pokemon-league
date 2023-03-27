@@ -26,6 +26,68 @@ class Matches(MethodView):
     def get(self):
         return MatchModel.query.all()
 
+@blp.route("/private/generate-matches")
+class GenerateMatches(MethodView):
+    @blp.arguments(GenerateMatchesSchema)
+    @blp.response(201)
+    def post(self, match_data):
+        jornada = match_data["jornada"]
+        nMatches = match_data["nMatches"]
+        nPlayers = PlayerModel.query.count()
+        lambdaNum = max_edges(nPlayers,nMatches)
+
+        start_time = time.time()
+
+        nMatchesDone = 0
+        while nMatchesDone < lambdaNum:
+            start_time = time.time()
+            while nMatchesDone < lambdaNum and time.time() - start_time < 2:
+                next_match = get_player_matches()[0]
+                player1 = PlayerModel.query.get_or_404(next_match[0])
+                player2 = PlayerModel.query.get_or_404(next_match[1])
+                if(createSingleMatch(player1, player2, jornada, nMatches)):
+                    nMatchesDone += 1
+
+            if nMatchesDone != lambdaNum:
+                nMatchesDone = 0 
+                time.sleep(max(0, 2 - (time.time() - start_time)))
+                delete_matches_of_jornada(jornada)
+            else:
+                return f"Matchmaking optimized, created {nMatchesDone} matches"
+        
+        return "Matchmaking not optimized, delete matches and restart",403
+
+@blp.route("/private/hardcode-match")
+class HardcodeMatch(MethodView):
+    @blp.arguments(HardcodeMatchSchema)
+    def post(self, match_data):
+
+        player1 = PlayerModel.query.get_or_404(match_data["player_1_id"])
+        player2 = PlayerModel.query.get_or_404(match_data["player_2_id"])
+        jornada = match_data["jornada"]
+        
+        msg =  f'Created match between {player1.username} and {player2.username} in jornada {jornada}' if createSingleMatch(player1, player2, jornada, 1) else 'Match could not been created'
+
+        return {"data" : msg}
+
+@blp.route("/private/clean-matches")
+class CleanMatches(MethodView):
+    @blp.arguments(GenerateMatchesSchema)
+    def delete(self, match_data):
+        
+        jornada = match_data["jornada"]
+    
+        if (jornada == 0):
+            matches = MatchModel.query.all()
+        else: 
+            matches = MatchModel.query.filter(MatchModel.jornada == jornada).all()
+
+        for match in matches:
+            db.session.delete(match)
+        db.session.commit()
+
+        return {"msg" : f"{len(matches)} matches deleted"}, 201
+    
 @blp.route("/fake/matches")
 class Matches(MethodView):
     @blp.response(200, MatchSchema(many=True))
@@ -102,66 +164,6 @@ class Matches(MethodView):
 		"player_2_id": 4
 	}
 ]
-
-@blp.route("/private/generate-matches")
-class GenerateMatches(MethodView):
-    @blp.arguments(GenerateMatchesSchema)
-    @blp.response(200)
-    def post(self, match_data):
-        jornada = match_data["jornada"]
-        nCombates = match_data["nCombates"]
-        nPlayers = PlayerModel.query.count()
-        lambdaNum = max_edges(nPlayers,nCombates)
-
-        start_time = time.time()
-
-        nCombatesDone = 0
-        while nCombatesDone < lambdaNum:
-            start_time = time.time()
-            while nCombatesDone < lambdaNum and time.time() - start_time < 2:
-                next_match = get_player_matches()[0]
-                player1 = PlayerModel.query.get_or_404(next_match[0])
-                player2 = PlayerModel.query.get_or_404(next_match[1])
-                if(createSingleMatch(player1, player2, jornada, nCombates)):
-                    nCombatesDone += 1
-
-            if nCombatesDone != lambdaNum:
-                nCombatesDone = 0 
-                time.sleep(max(0, 2 - (time.time() - start_time)))
-                delete_matches_of_jornada(jornada)
-            else:
-                return f"Matcheo óptimo, creados {nCombatesDone} enfrentamientos"
-        
-        return "Matcheo no óptimo, borrar combates y reiniciar"
-
-@blp.route("/private/hardcode-match")
-class HardcodeMatch(MethodView):
-    @blp.arguments(HardcodeMatchSchema)
-    def post(self, match_data):
-
-        player1 = PlayerModel.query.get_or_404(match_data["player_1_id"])
-        player2 = PlayerModel.query.get_or_404(match_data["player_2_id"])
-        jornada = match_data["jornada"]
-
-        return {"data" :createSingleMatch(player1, player2, jornada, 1)}
-
-@blp.route("/private/clean-matches")
-class CleanMatches(MethodView):
-    @blp.arguments(GenerateMatchesSchema)
-    def delete(self, match_data):
-        
-        jornada = match_data["jornada"]
-    
-        if (jornada == 0):
-            partidos = MatchModel.query.all()
-        else: 
-            partidos = MatchModel.query.filter(MatchModel.jornada == jornada).all()
-
-        for partido in partidos:
-            db.session.delete(partido)
-        db.session.commit()
-
-        return {"msg" : f"Partidos borrados, {len(partidos)}"}, 200
 
 def createSingleMatch(player1, player2, jornada, limit):
 

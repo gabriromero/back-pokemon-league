@@ -21,8 +21,54 @@ from schemas import PrivatePlayersSchema
 
 blp = Blueprint("Players", __name__, description="Player operations")
 
-@blp.route("/private/create-player")
+@blp.route("/classification")
+class Classification(MethodView):
+    @blp.response(200, ClassificationSchema(many=True))
+    def get(self):
+        return PlayerModel.query.all()
+    
+@blp.route("/login")
+class Login(MethodView):
+    @blp.arguments(LoginPlayerSchema)
+    def post(self, user_data):
+        player = PlayerModel.query.filter(
+            PlayerModel.username == user_data["username"]
+        ).first()
+
+        if player and player.password == user_data["password"]:
+            access_token = create_access_token(identity=player.id)
+            return {"access_token" : access_token}
+        
+        abort(401, message="Invalid credentials")
+
+@blp.route("/myself/profile")
+class Profile(MethodView):
+    @blp.response(200, ProfileSchema)
+    @jwt_required()
+    def get(self):
+        player = PlayerModel.query.get_or_404(get_jwt_identity())
+        return player
+
+    @blp.arguments(ProfileUpdateSchema)
+    @blp.response(200, ProfileSchema)
+    @jwt_required()
+    def put(self, profile_data):
+        player = PlayerModel.query.get_or_404(get_jwt_identity())
+
+        if("profile_pic" in profile_data):
+            player.profile_pic = profile_data["profile_pic"]
+        
+        db.session.add(player)
+        db.session.commit()
+
+        return player,200
+    
+@blp.route("/private/player")
 class Register(MethodView):
+    @blp.response(200,PrivatePlayersSchema(many=True))
+    def get(self):
+        return PlayerModel.query.all()
+    
     @blp.arguments(CreatePlayerSchema)
     def post(self, player_data):
         player = PlayerModel(
@@ -38,8 +84,6 @@ class Register(MethodView):
         
         return {"msg" : f"Player with username {player.username} created"}, 201
     
-@blp.route("/private/delete-player")
-class Register(MethodView):
     @blp.arguments(DeletePlayerSchema)
     def delete(self, player_data):
         player = PlayerModel.query.get_or_404(player_data["id"])
@@ -48,18 +92,6 @@ class Register(MethodView):
         db.session.commit()
         return {"message": f"Player {player.username} deleted."}
     
-@blp.route("/private/players")
-class Register(MethodView):
-    @blp.response(200,PrivatePlayersSchema(many=True))
-    def get(self):
-        return PlayerModel.query.all()
-
-@blp.route("/classification")
-class Classification(MethodView):
-    @blp.response(200, ClassificationSchema(many=True))
-    def get(self):
-        return PlayerModel.query.all()
-
 @blp.route("/fake/classification")
 class FakePlayerInfo(MethodView):
     @blp.response(200)
@@ -90,39 +122,3 @@ class FakePlayerInfo(MethodView):
                 'matches_won'     : 10,
             }
         ]
-
-@blp.route("/login")
-class Login(MethodView):
-    @blp.arguments(LoginPlayerSchema)
-    def post(self, user_data):
-        player = PlayerModel.query.filter(
-            PlayerModel.username == user_data["username"]
-        ).first()
-
-        if player and player.password == user_data["password"]:
-            access_token = create_access_token(identity=player.id)
-            return {"access_token" : access_token}
-        
-        abort(401, message="Invalid credentials")
-
-@blp.route("/profile")
-class Profile(MethodView):
-    @blp.response(200, ProfileSchema)
-    @jwt_required()
-    def get(self):
-        player = PlayerModel.query.get_or_404(get_jwt_identity())
-        return player
-
-    @blp.arguments(ProfileUpdateSchema)
-    @blp.response(200, ProfileSchema)
-    @jwt_required()
-    def put(self, profile_data):
-        player = PlayerModel.query.get_or_404(get_jwt_identity())
-
-        if("profile_pic" in profile_data):
-            player.profile_pic = profile_data["profile_pic"]
-        
-        db.session.add(player)
-        db.session.commit()
-
-        return player,200
