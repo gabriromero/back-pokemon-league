@@ -40,7 +40,7 @@ class GenerateMatches(MethodView):
         start_time = time.time()
 
         nCombatesDone = 0
-        while nCombatesDone < lambdaNum and time.time() - start_time < 3:
+        while nCombatesDone < lambdaNum and time.time() - start_time < 2:
             player1 = PlayerModel.query.get_or_404(get_player_matches()[0][0])
             player2 = PlayerModel.query.get_or_404(get_player_matches()[0][1])
             if(createSingleMatch(player1, player2, jornada, nCombates)):
@@ -88,9 +88,19 @@ def createSingleMatch(player1, player2, jornada, limit):
     if(player1.id == player2.id):
         return False
 
-    match_exists = ((MatchModel.query.filter(MatchModel.player_1_id == player1.id, MatchModel.player_2_id == player2.id).first() or
-                            MatchModel.query.filter(MatchModel.player_1_id == player2.id, MatchModel.player_2_id == player1.id).first()) and
-                            MatchModel.query.filter(MatchModel.jornada == jornada).first())
+    match_exists = MatchModel.query.filter(
+        db.and_(
+            db.or_(
+                MatchModel.player_1_id == player1.id,
+                MatchModel.player_1_id == player2.id
+            ),
+            db.or_(
+                MatchModel.player_2_id == player1.id,
+                MatchModel.player_2_id == player2.id
+            ),
+            MatchModel.jornada == jornada
+        )
+    ).first()
             
     if(match_exists):
         return False
@@ -161,3 +171,7 @@ def get_matches_for_jornada(player_id, jornada):
 
 def max_edges(n, max_aristas):
     return min(n * max_aristas // 2, n * (n - 1) // 2)
+
+def delete_matches_of_jornada(jornada):
+    db.session.query(MatchModel).filter_by(jornada=jornada).delete()
+    db.session.commit()
