@@ -26,6 +26,83 @@ class Matches(MethodView):
     def get(self):
         return MatchModel.query.all()
 
+@blp.route("/fake/matches")
+class Matches(MethodView):
+    @blp.response(200, MatchSchema(many=True))
+    def get(self):
+        return [
+	{
+		"jornada": 1,
+		"player_1_finished": 0,
+		"player_1_id": 4,
+		"player_2_finished": 0,
+		"player_2_id": 5
+	},
+	{
+		"jornada": 1,
+		"player_1_finished": 0,
+		"player_1_id": 1,
+		"player_2_finished": 0,
+		"player_2_id": 4
+	},
+	{
+		"jornada": 1,
+		"player_1_finished": 0,
+		"player_1_id": 3,
+		"player_2_finished": 0,
+		"player_2_id": 5
+	},
+	{
+		"jornada": 1,
+		"player_1_finished": 0,
+		"player_1_id": 1,
+		"player_2_finished": 0,
+		"player_2_id": 2
+	},
+	{
+		"jornada": 1,
+		"player_1_finished": 0,
+		"player_1_id": 2,
+		"player_2_finished": 0,
+		"player_2_id": 3
+	},
+	{
+		"jornada": 2,
+		"player_1_finished": 0,
+		"player_1_id": 2,
+		"player_2_finished": 0,
+		"player_2_id": 5
+	},
+	{
+		"jornada": 2,
+		"player_1_finished": 0,
+		"player_1_id": 1,
+		"player_2_finished": 0,
+		"player_2_id": 5
+	},
+	{
+		"jornada": 2,
+		"player_1_finished": 0,
+		"player_1_id": 2,
+		"player_2_finished": 0,
+		"player_2_id": 4
+	},
+	{
+		"jornada": 2,
+		"player_1_finished": 0,
+		"player_1_id": 1,
+		"player_2_finished": 0,
+		"player_2_id": 3
+	},
+	{
+		"jornada": 2,
+		"player_1_finished": 0,
+		"player_1_id": 3,
+		"player_2_finished": 0,
+		"player_2_id": 4
+	}
+]
+
 @blp.route("/private/generate-matches")
 class GenerateMatches(MethodView):
     @blp.arguments(GenerateMatchesSchema)
