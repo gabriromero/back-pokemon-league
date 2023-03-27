@@ -43,14 +43,15 @@ class GenerateMatches(MethodView):
         while nCombatesDone < lambdaNum:
             start_time = time.time()
             while nCombatesDone < lambdaNum and time.time() - start_time < 2:
-                player1 = PlayerModel.query.get_or_404(get_player_matches()[0][0])
-                player2 = PlayerModel.query.get_or_404(get_player_matches()[0][1])
+                next_match = get_player_matches()[0]
+                player1 = PlayerModel.query.get_or_404(next_match[0])
+                player2 = PlayerModel.query.get_or_404(next_match[1])
                 if(createSingleMatch(player1, player2, jornada, nCombates)):
                     nCombatesDone += 1
 
             if nCombatesDone != lambdaNum:
-                nCombatesDone = 0 # Reiniciar el contador de combates
-                time.sleep(max(0, 2 - (time.time() - start_time))) # Esperar el tiempo restante para alcanzar los 2 segundos completos
+                nCombatesDone = 0 
+                time.sleep(max(0, 2 - (time.time() - start_time)))
                 delete_matches_of_jornada(jornada)
             else:
                 return "Matcheo óptimo!"
@@ -112,9 +113,6 @@ def createSingleMatch(player1, player2, jornada, limit):
     if(match_exists):
         return False
     
-    
-
-
     match = MatchModel(player_1_id = player1.id,
                         player_2_id = player2.id,
                         jornada = jornada)
