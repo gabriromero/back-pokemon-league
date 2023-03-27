@@ -41,6 +41,7 @@ class MatchSchema(Schema):
     player_2_id = fields.Int(required=True)
     player_1_finished = fields.Int(required=True)
     player_2_finished = fields.Int(required=True)
+    result = fields.Int(required=True)
 
 class GenerateMatchesSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=0, max=10)])

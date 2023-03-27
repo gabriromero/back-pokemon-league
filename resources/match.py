@@ -22,9 +22,30 @@ blp = Blueprint("Matches", __name__, description="Match operations")
 
 @blp.route("/matches")
 class Matches(MethodView):
-    @blp.response(200, MatchSchema(many=True))
+    @blp.response(200)
     def get(self):
-        return MatchModel.query.all()
+        matches = MatchModel.query.all()
+        matchesAppend = []
+
+        for match in matches:
+            player_1 = PlayerModel.query.get(match.player_1_id)
+            player_2 = PlayerModel.query.get(match.player_2_id)
+
+            result = ""            
+            if(PlayerModel.query.get(match.result)):
+                result = PlayerModel.query.get(match.result).username
+
+
+            matchesAppend.append({
+                'result': result,
+                'player_1_finished': match.player_1_finished,
+                'player_2_finished': match.player_2_finished,
+                'jornada': match.jornada,
+                'player_1_username': player_1.username,
+                'player_2_username': player_2.username
+            })
+
+        return matchesAppend
 
 @blp.route("/private/generate-matches")
 class GenerateMatches(MethodView):
@@ -90,80 +111,122 @@ class CleanMatches(MethodView):
     
 @blp.route("/fake/matches")
 class Matches(MethodView):
-    @blp.response(200, MatchSchema(many=True))
+    @blp.response(200)
     def get(self):
         return [
-	{
-		"jornada": 1,
-		"player_1_finished": 0,
-		"player_1_id": 4,
-		"player_2_finished": 0,
-		"player_2_id": 5
-	},
-	{
-		"jornada": 1,
-		"player_1_finished": 0,
-		"player_1_id": 1,
-		"player_2_finished": 0,
-		"player_2_id": 4
-	},
-	{
-		"jornada": 1,
-		"player_1_finished": 0,
-		"player_1_id": 3,
-		"player_2_finished": 0,
-		"player_2_id": 5
-	},
-	{
-		"jornada": 1,
-		"player_1_finished": 0,
-		"player_1_id": 1,
-		"player_2_finished": 0,
-		"player_2_id": 2
-	},
-	{
-		"jornada": 1,
-		"player_1_finished": 0,
-		"player_1_id": 2,
-		"player_2_finished": 0,
-		"player_2_id": 3
-	},
-	{
-		"jornada": 2,
-		"player_1_finished": 0,
-		"player_1_id": 2,
-		"player_2_finished": 0,
-		"player_2_id": 5
-	},
-	{
-		"jornada": 2,
-		"player_1_finished": 0,
-		"player_1_id": 1,
-		"player_2_finished": 0,
-		"player_2_id": 5
-	},
-	{
-		"jornada": 2,
-		"player_1_finished": 0,
-		"player_1_id": 2,
-		"player_2_finished": 0,
-		"player_2_id": 4
-	},
-	{
-		"jornada": 2,
-		"player_1_finished": 0,
-		"player_1_id": 1,
-		"player_2_finished": 0,
-		"player_2_id": 3
-	},
-	{
-		"jornada": 2,
-		"player_1_finished": 0,
-		"player_1_id": 3,
-		"player_2_finished": 0,
-		"player_2_id": 4
-	}
-]
+            {
+                "jornada": 1,
+                "player_1_finished": False,
+                "player_1_username": "erdeiby",
+                "player_2_finished": False,
+                "player_2_username": "kmilon",
+                "result": "erdeiby"
+            },
+            {
+                "jornada": 1,
+                "player_1_finished": False,
+                "player_1_username": "john",
+                "player_2_finished": False,
+                "player_2_username": "avdalian",
+                "result": "avdalian"
+            },
+            {
+                "jornada": 1,
+                "player_1_finished": False,
+                "player_1_username": "avdalian",
+                "player_2_finished": False,
+                "player_2_username": "erdeiby",
+                "result": ""
+            },
+            {
+                "jornada": 1,
+                "player_1_finished": False,
+                "player_1_username": "guzzom",
+                "player_2_finished": False,
+                "player_2_username": "avdalian",
+                "result": ""
+            },
+            {
+                "jornada": 1,
+                "player_1_finished": False,
+                "player_1_username": "john",
+                "player_2_finished": False,
+                "player_2_username": "erdeiby",
+                "result": "erdeiby"
+            },
+            {
+                "jornada": 1,
+                "player_1_finished": False,
+                "player_1_username": "john",
+                "player_2_finished": False,
+                "player_2_username": "kmilon",
+                "result": ""
+            },
+            {
+                "jornada": 1,
+                "player_1_finished": False,
+                "player_1_username": "guzzom",
+                "player_2_finished": False,
+                "player_2_username": "kmilon",
+                "result": "kmilon"
+            },
+            {
+                "jornada": 2,
+                "player_1_finished": False,
+                "player_1_username": "guzzom",
+                "player_2_finished": False,
+                "player_2_username": "erdeiby",
+                "result": "guzzom"
+            },
+            {
+                "jornada": 2,
+                "player_1_finished": False,
+                "player_1_username": "guzzom",
+                "player_2_finished": False,
+                "player_2_username": "john",
+                "result": ""
+            },
+            {
+                "jornada": 2,
+                "player_1_finished": False,
+                "player_1_username": "avdalian",
+                "player_2_finished": False,
+                "player_2_username": "kmilon",
+                "result": "kmilon"
+            },
+            {
+                "jornada": 2,
+                "player_1_finished": False,
+                "player_1_username": "erdeiby",
+                "player_2_finished": False,
+                "player_2_username": "kmilon",
+                "result": ""
+            },
+            {
+                "jornada": 2,
+                "player_1_finished": False,
+                "player_1_username": "avdalian",
+                "player_2_finished": False,
+                "player_2_username": "erdeiby",
+                "result": ""
+            },
+            {
+                "jornada": 2,
+                "player_1_finished": False,
+                "player_1_username": "john",
+                "player_2_finished": False,
+                "player_2_username": "kmilon",
+                "result": ""
+            },
+            {
+                "jornada": 2,
+                "player_1_finished": False,
+                "player_1_username": "guzzom",
+                "player_2_finished": False,
+                "player_2_username": "avdalian",
+                "result": ""
+            }
+        ]
 
 def createSingleMatch(player1, player2, jornada, limit):
 
