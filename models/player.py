@@ -9,3 +9,4 @@ class PlayerModel(db.Model):
     profile_pic = db.Column(db.String(255), default='trainerPixel')
     matches_played = db.Column(db.Integer, default=0)
     matches_won = db.Column(db.Integer, default=0)
+    matches_won_frozen = db.Column(db.Integer, default=0)
