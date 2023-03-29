@@ -44,6 +44,15 @@ class MatchSchema(Schema):
     player_2_finished = fields.Int(required=True)
     result = fields.Int(required=True)
 
+class MatchDiferenciaSchema(Schema):
+    jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=9)])
+    player_1_id = fields.Int(required=True)
+    player_2_id = fields.Int(required=True)
+    player_1_finished = fields.Int(required=True)
+    player_2_finished = fields.Int(required=True)
+    result = fields.Int(required=True) 
+    diferencia = fields.Int(required=True) 
+
 class GenerateMatchesSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=0, max=10)])
     nMatches = fields.Int(validate=[validate.Range(min=2, max=10)])
@@ -52,3 +61,6 @@ class HardcodeMatchSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=10)])
     player_1_id = fields.Int(required=True)
     player_2_id = fields.Int(required=True)
+
+class MyMatchesSchema(Schema):
+    jornada = fields.Int(required=True, validate=[validate.Range(min=0, max=10)])
