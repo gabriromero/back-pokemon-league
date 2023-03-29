@@ -92,6 +92,18 @@ class Register(MethodView):
         db.session.commit()
         return {"message": f"Player {player.username} deleted."}
     
+@blp.route("/private/freeze-wins")
+class Register(MethodView):
+    @blp.response(200)
+    def put(self):
+        players = PlayerModel.query.all()
+
+        for player in players:
+            player.matches_won_frozen = player.matches_won
+            db.session.commit()
+
+        return ({'message': 'Matches frozen successfully.'}), 200
+    
 @blp.route("/fake/classification")
 class FakePlayerInfo(MethodView):
     @blp.response(200)

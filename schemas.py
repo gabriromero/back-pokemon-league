@@ -17,6 +17,7 @@ class PrivatePlayersSchema(Schema):
     profile_pic = fields.Str(required=True)
     matches_played = fields.Int()
     matches_won = fields.Int()
+    matches_won_frozen = fields.Int()
 
 class CreatePlayerSchema(Schema):
     id = fields.Int(dump_only=True)
