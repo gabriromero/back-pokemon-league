@@ -36,6 +36,8 @@ class MyMatches(MethodView):
             enemyId = match.player_2_id if myself.id == match.player_1_id else match.player_1_id
             enemy = PlayerModel.query.get_or_404(enemyId)
             match.diferencia = myself.matches_won_frozen - enemy.matches_won_frozen
+            match.player_1_username = myself.username
+            match.player_2_username = enemy.username
         return matches
 
 @blp.route("/classification")
