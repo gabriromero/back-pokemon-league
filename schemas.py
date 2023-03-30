@@ -34,6 +34,11 @@ class LoginPlayerSchema(Schema):
 class ProfileUpdateSchema(Schema):
     profile_pic  = fields.Str()
 
+class MarkResultSchema(Schema):
+    jornada = fields.Int(required=True, validate=[validate.Range(min=0, max=10)])
+    player_1_username = fields.Str(required=True)
+    player_2_username = fields.Str(required=True)
+    player_winner_username = fields.Str(required=True)
 
 # Match Schema
 class MatchSchema(Schema):
