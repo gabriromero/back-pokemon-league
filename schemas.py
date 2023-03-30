@@ -47,7 +47,9 @@ class MatchSchema(Schema):
 class MatchDiferenciaSchema(Schema):
     jornada = fields.Int(required=True, validate=[validate.Range(min=1, max=9)])
     player_1_id = fields.Int(required=True)
+    player_1_username = fields.Str(required=True, validate=[validate.Length(min=3, max=12)])
     player_2_id = fields.Int(required=True)
+    player_2_username = fields.Str(required=True, validate=[validate.Length(min=3, max=12)])
     player_1_finished = fields.Int(required=True)
     player_2_finished = fields.Int(required=True)
     result = fields.Int(required=True) 
