@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 from flask import Flask, jsonify
@@ -32,6 +33,8 @@ app.config['API_SPEC_OPTIONS'] = {
             }
     }
 }
+
+app.config['JWT_EXPIRATION_DELTA'] = timedelta(days=90)
 
 app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["API_TITLE"] = "pokemon-league API"
