@@ -18,19 +18,17 @@ from schemas import ProfileSchema
 from schemas import LoginPlayerSchema
 from schemas import ProfileUpdateSchema
 from schemas import PrivatePlayersSchema
-from schemas import MyMatchesSchema
 from schemas import MatchDiferenciaSchema
 
 blp = Blueprint("Players", __name__, description="Player operations")
 
 @blp.route("/myself/matches")
-class MyMatches(MethodView):
-    @blp.arguments(MyMatchesSchema)
+class MyMatches(MethodView):    
     @blp.response(200, MatchDiferenciaSchema(many=True))
     @jwt_required()
-    def get(self, match_data):
+    def get(self):
         myself = PlayerModel.query.get_or_404(get_jwt_identity()) 
-        jornada = match_data["jornada"] 
+        jornada = int(request.args.get('jornada')) 
         matches = MatchModel.query.filter((MatchModel.player_1_id == myself.id) | (MatchModel.player_2_id == myself.id) , (MatchModel.jornada == jornada)).all()   
         for match in matches:
             enemyId = match.player_2_id if myself.id == match.player_1_id else match.player_1_id
