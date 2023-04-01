@@ -2,6 +2,9 @@
 from itertools import combinations
 import random
 import time
+
+from .decorators.decorators import secret_header_required
+
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
@@ -51,6 +54,7 @@ class Matches(MethodView):
 class GenerateMatches(MethodView):
     @blp.arguments(GenerateMatchesSchema)
     @blp.response(201)
+    @secret_header_required
     def post(self, match_data):
         jornada = match_data["jornada"]
         nMatches = match_data["nMatches"]
@@ -81,6 +85,7 @@ class GenerateMatches(MethodView):
 @blp.route("/private/hardcode-match")
 class HardcodeMatch(MethodView):
     @blp.arguments(HardcodeMatchSchema)
+    @secret_header_required
     def post(self, match_data):
 
         player1 = PlayerModel.query.get_or_404(match_data["player_1_id"])
@@ -94,6 +99,7 @@ class HardcodeMatch(MethodView):
 @blp.route("/private/clean-matches")
 class CleanMatches(MethodView):
     @blp.arguments(GenerateMatchesSchema)
+    @secret_header_required
     def delete(self, match_data):
         
         jornada = match_data["jornada"]

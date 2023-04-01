@@ -1,5 +1,6 @@
 from operator import and_, or_
-import os
+
+from .decorators.decorators import secret_header_required
 
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt, create_access_token, get_jwt_identity
@@ -159,6 +160,7 @@ class Profile(MethodView):
 @blp.route("/private/player")
 class Register(MethodView):
     @blp.response(200,PrivatePlayersSchema(many=True))
+    @secret_header_required
     def get(self):
         return PlayerModel.query.all()
     
@@ -188,6 +190,7 @@ class Register(MethodView):
 @blp.route("/private/freeze-wins")
 class Register(MethodView):
     @blp.response(200)
+    @secret_header_required
     def put(self):
         players = PlayerModel.query.all()
 
