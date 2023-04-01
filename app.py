@@ -34,7 +34,6 @@ app.config['API_SPEC_OPTIONS'] = {
     }
 }
 
-app.config['JWT_EXPIRATION_DELTA'] = timedelta(days=90)
 
 app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["API_TITLE"] = "pokemon-league API"
@@ -50,6 +49,7 @@ migrate = Migrate(app, db)
 
 api = Api(app)
 
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=120)
 app.config["JWT_SECRET_KEY"] = os.getenv("SECRET_KEY")
 jwt =  JWTManager(app)
 
