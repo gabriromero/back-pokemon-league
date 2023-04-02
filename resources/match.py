@@ -66,7 +66,7 @@ class GenerateMatches(MethodView):
         nMatchesDone = 0
         while nMatchesDone < lambdaNum:
             start_time = time.time()
-            while nMatchesDone < lambdaNum and time.time() - start_time < 2:
+            while nMatchesDone < lambdaNum and time.time() - start_time < 0.5:
                 next_match = get_player_matches()[0]
                 player1 = PlayerModel.query.get_or_404(next_match[0])
                 player2 = PlayerModel.query.get_or_404(next_match[1])
@@ -75,7 +75,7 @@ class GenerateMatches(MethodView):
 
             if nMatchesDone != lambdaNum:
                 nMatchesDone = 0 
-                time.sleep(max(0, 2 - (time.time() - start_time)))
+                time.sleep(max(0, 0.5 - (time.time() - start_time)))
                 delete_matches_of_jornada(jornada)
             else:
                 return f"Matchmaking optimized, created {nMatchesDone} matches"
