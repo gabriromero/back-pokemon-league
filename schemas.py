@@ -69,5 +69,3 @@ class HardcodeMatchSchema(Schema):
     player_1_id = fields.Int(required=True)
     player_2_id = fields.Int(required=True)
 
-class MyMatchesSchema(Schema):
-    jornada = fields.Int(required=True, validate=[validate.Range(min=0, max=10)])
