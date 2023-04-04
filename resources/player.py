@@ -34,11 +34,18 @@ class MyMatches(MethodView):
         jornada = int(request.args.get('jornada')) 
         matches = MatchModel.query.filter((MatchModel.player_1_id == myself.id) | (MatchModel.player_2_id == myself.id) , (MatchModel.jornada == jornada)).all()   
         for match in matches:
-            enemyId = match.player_2_id if myself.id == match.player_1_id else match.player_1_id
-            enemy = PlayerModel.query.get_or_404(enemyId)
+            if myself.id == match.player_1_id:                
+                enemyId = match.player_2_id
+                enemy = PlayerModel.query.get_or_404(enemyId)
+                match.player_1_username = myself.username
+                match.player_2_username = enemy.username
+            else:
+                enemyId = match.player_1_id
+                enemy = PlayerModel.query.get_or_404(enemyId)                
+                match.player_1_username = enemy.username
+                match.player_2_username = myself.username
+            
             match.diferencia = myself.matches_won_frozen - enemy.matches_won_frozen
-            match.player_1_username = myself.username
-            match.player_2_username = enemy.username
         return matches
     
 @blp.route("/myself/mark-result")
