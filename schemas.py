@@ -57,7 +57,8 @@ class MatchDiferenciaSchema(Schema):
     player_2_username = fields.Str(required=True, validate=[validate.Length(min=3, max=12)])
     player_1_finished = fields.Int(required=True)
     player_2_finished = fields.Int(required=True)
-    result = fields.Int(required=True) 
+    result = fields.Int(required=True)
+    result_username = fields.Str(required=True, validate=[validate.Length(min=3, max=12)])
     diferencia = fields.Int(required=True) 
 
 class GenerateMatchesSchema(Schema):

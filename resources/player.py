@@ -39,6 +39,10 @@ class MyMatches(MethodView):
             match.diferencia = myself.matches_won_frozen - enemy.matches_won_frozen
             match.player_1_username = myself.username
             match.player_2_username = enemy.username
+            if match.result != 0:
+                match.result_username = myself.username if myself.id == match.result else enemy.username
+            else:
+                match.result_username = ""
         return matches
     
 @blp.route("/myself/mark-result")
