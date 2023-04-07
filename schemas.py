@@ -71,3 +71,5 @@ class HardcodeMatchSchema(Schema):
     player_1_id = fields.Int(required=True)
     player_2_id = fields.Int(required=True)
 
+class PutJornadaSchema(Schema):
+    nuevaJornada = fields.Int(required=True, validate=[validate.Range(min=1, max=10)])

@@ -14,6 +14,7 @@ from db import db
 
 from resources.player import blp as PlayerBlueprint
 from resources.match import blp as MatchBlueprint
+from resources.jornada import blp as JornadaBlueprint
 
 
 app = Flask(__name__)
@@ -55,3 +56,4 @@ jwt =  JWTManager(app)
 
 api.register_blueprint(PlayerBlueprint)
 api.register_blueprint(MatchBlueprint)
+api.register_blueprint(JornadaBlueprint)
