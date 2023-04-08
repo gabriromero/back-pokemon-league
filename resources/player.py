@@ -136,10 +136,10 @@ class Login(MethodView):
     @blp.arguments(LoginPlayerSchema)
     def post(self, user_data):
         player = PlayerModel.query.filter(
-            PlayerModel.username == user_data["username"]
+            PlayerModel.username.lower() == user_data["username"].lower()
         ).first()
 
-        if player and player.password == user_data["password"]:
+        if player and player.password.lower() == user_data["password"].lower():
             access_token = create_access_token(identity=player.id)
             return {"access_token" : access_token}
         
