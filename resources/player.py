@@ -39,11 +39,15 @@ class MyMatches(MethodView):
                 enemy = PlayerModel.query.get_or_404(enemyId)
                 match.player_1_username = myself.username
                 match.player_2_username = enemy.username
+                match.player_1_profile_pic = myself.profile_pic
+                match.player_2_profile_pic = enemy.profile_pic
             else:
                 enemyId = match.player_1_id
                 enemy = PlayerModel.query.get_or_404(enemyId)                
                 match.player_1_username = enemy.username
                 match.player_2_username = myself.username
+                match.player_1_profile_pic = enemy.profile_pic
+                match.player_2_profile_pic = myself.profile_pic
             
             match.diferencia = myself.matches_won_frozen - enemy.matches_won_frozen            
             if match.result != 0:
