@@ -45,7 +45,9 @@ class Matches(MethodView):
                 'player_2_finished': match.player_2_finished,
                 'jornada': match.jornada,
                 'player_1_username': player_1.username,
-                'player_2_username': player_2.username
+                'player_2_username': player_2.username,
+                'player_1_profile_pic': player_1.profile_pic,
+                'player_2_profile_pic': player_2.profile_pic,
             })
 
         return matchesAppend
