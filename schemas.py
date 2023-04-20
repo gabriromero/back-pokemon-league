@@ -32,6 +32,9 @@ class LoginPlayerSchema(Schema):
     username = fields.Str(required=True)
     password = fields.Str(required=True, load_only=True)
 
+class AvailableSkinsSchema(Schema):
+    num_skins = fields.Int(required=False)
+    
 class ProfileUpdateSchema(Schema):
     profile_pic  = fields.Str()
 
