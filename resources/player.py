@@ -179,9 +179,15 @@ class Profile(MethodView):
     @jwt_required()
     def put(self, profile_data):
         player = PlayerModel.query.get_or_404(get_jwt_identity())
+        skin_selected = profile_data["profile_pic"]
+
+        all_skins = [pic[0] for pic in db.session.query(distinct(PlayerModel.profile_pic)).all()]
+
+        if(skin_selected in all_skins):
+            abort(400,message="Ya existe un jugador con esa skin")
 
         if("profile_pic" in profile_data):
-            player.profile_pic = profile_data["profile_pic"]
+            player.profile_pic = skin_selected
         
         db.session.add(player)
         db.session.commit()
