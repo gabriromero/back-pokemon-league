@@ -24,6 +24,7 @@ from schemas import ProfileUpdateSchema
 from schemas import PrivatePlayersSchema
 from schemas import MatchDiferenciaSchema
 from schemas import MarkResultSchema
+from schemas import AvailableSkinsSchema
 
 blp = Blueprint("Players", __name__, description="Player operations")
 
@@ -150,6 +151,19 @@ class Login(MethodView):
             return {"access_token" : access_token}
         
         abort(401, message="Invalid credentials")
+
+@blp.route("/available-skins")
+class AvailableSkins(MethodView):
+    @blp.response(200)
+    def get(self):
+        num_skins = int(request.args.get('num_skins')) 
+        all_skins = [pic[0] for pic in db.session.query(distinct(PlayerModel.profile_pic)).all()]
+        numbers_available = available_skins(all_skins, num_skins)
+        return numbers_available
+    
+def available_skins(used_skins, num_skins):
+    used_numbers = [int(skin.split("-")[1]) for skin in used_skins if skin.startswith("trainer-")]
+    return [i for i in range(1, num_skins+1) if i not in used_numbers]
 
 @blp.route("/myself/profile")
 class Profile(MethodView):
