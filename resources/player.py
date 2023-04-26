@@ -154,10 +154,9 @@ class Login(MethodView):
 
 @blp.route("/available-skins")
 class AvailableSkins(MethodView):
-    @blp.arguments(AvailableSkinsSchema)
     @blp.response(200)
-    def get(self, skins_data):
-        num_skins = skins_data["num_skins"]
+    def get(self):
+        num_skins = int(request.args.get('num_skins')) 
         all_skins = [pic[0] for pic in db.session.query(distinct(PlayerModel.profile_pic)).all()]
         numbers_available = available_skins(all_skins, num_skins)
         return numbers_available
