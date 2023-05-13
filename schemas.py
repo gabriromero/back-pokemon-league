@@ -4,6 +4,7 @@ from marshmallow import Schema, fields, validate
 class ClassificationSchema(Schema):
     username = fields.Str(required=True, validate=[validate.Length(min=3, max=12)])
     matches_won = fields.Int()
+    matches_played = fields.Int()
     profile_pic = fields.Str()
 
 class ProfileSchema(Schema):
