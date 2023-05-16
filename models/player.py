@@ -10,3 +10,4 @@ class PlayerModel(db.Model):
     matches_played = db.Column(db.Integer, default=0)
     matches_won = db.Column(db.Integer, default=0)
     matches_won_frozen = db.Column(db.Integer, default=0)
+    tier = db.Column(db.Integer, default=0)

@@ -25,6 +25,7 @@ from schemas import PrivatePlayersSchema
 from schemas import MatchDiferenciaSchema
 from schemas import MarkResultSchema
 from schemas import AvailableSkinsSchema
+from schemas import SetTierSchema
 
 blp = Blueprint("Players", __name__, description="Player operations")
 
@@ -235,7 +236,22 @@ class Register(MethodView):
             db.session.commit()
 
         return ({'message': 'Matches frozen successfully.'}), 200
-    
+
+@blp.route("/private/set-tiers")
+class Register(MethodView):
+    @blp.arguments(SetTierSchema)
+    @blp.response(200)
+    @secret_header_required
+    def put(self, tier_data):
+        n_players_upgrade = tier_data["n_players_upgrade"]
+        
+        players = PlayerModel.query.order_by(PlayerModel.matches_won.desc()).limit(n_players_upgrade).all()
+
+        for player in players:
+            player.tier = 1
+            db.session.commit()
+
+        return ({'message': f'First {n_players_upgrade} set tier to 1.'}), 200    
 @blp.route("/fake/classification")
 class FakePlayerInfo(MethodView):
     @blp.response(200)

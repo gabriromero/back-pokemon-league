@@ -6,6 +6,7 @@ class ClassificationSchema(Schema):
     matches_won = fields.Int()
     matches_played = fields.Int()
     profile_pic = fields.Str()
+    tier = fields.Int()
 
 class ProfileSchema(Schema):
     username = fields.Str(required=True, validate=[validate.Length(min=3, max=12)])
@@ -79,3 +80,6 @@ class HardcodeMatchSchema(Schema):
 
 class PutJornadaSchema(Schema):
     nuevaJornada = fields.Int(required=True, validate=[validate.Range(min=1, max=10)])
+
+class SetTierSchema(Schema):
+    n_players_upgrade = fields.Int(required=True)
