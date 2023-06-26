@@ -67,6 +67,8 @@ class MarkResult(MethodView):
     @blp.response(200)
     @jwt_required()
     def post(self, match_data):
+
+        win_multiplayer = 2
         
         jornada = match_data["jornada"]
         
@@ -125,9 +127,9 @@ class MarkResult(MethodView):
 
                 return f"Results do not coincide, restarting marks",200
             else:
-                player_winner.matches_played += 1
-                player_loser.matches_played += 1
-                player_winner.matches_won += 1
+                player_winner.matches_played += 1 * win_multiplayer
+                player_loser.matches_played += 1 * win_multiplayer
+                player_winner.matches_won += 1 * win_multiplayer
 
                 db.session.commit()
 
